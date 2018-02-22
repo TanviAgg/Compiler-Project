@@ -140,6 +140,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 				break;
 
 			default:
+				return;
 
 		}
 	}
@@ -171,9 +172,13 @@ void removeComments(char *testcaseFile)
 		while((i != read) && (line[i] != '#')){
 			i++;
 		}
-		if(i != read)
+		if(i == read){
+			printf("%s", line);
+		}
+		else{			
 			line[i] = '\0';
-		printf("%s\n", line);
+			printf("%s\n", line);
+		}
 	}
 
 	fclose(fp);
