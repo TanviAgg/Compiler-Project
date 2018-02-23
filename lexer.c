@@ -1153,8 +1153,127 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						break;
 				}
 				break;
-			case 46:
 			
+			case 46:
+				while( (97 <= buff[offset] && buff[offset] <= 122) || (65 <= buff[offset] && buff[offset] <= 90)){
+					lexeme[index++] = buff[offset++];
+					if (offset == k || buff[offset] == '\0'){
+						if (feof(fp)){
+							break;
+						}
+						memset(buff, 0, sizeof(buff));
+						fp = getStream(fp, buff, k);
+						offset = 0;
+					}
+				}
+				if(48 <= buff[offset] && buff[offset] <= 57){
+					lexeme[index++] = buff[offset++];
+					state = 47;
+					index = 0;
+					token.id = ID;
+					token.lineNo = lineNo;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "end")==0){
+					token.id = END;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "int")==0){
+					token.id = INT;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "real")==0){
+					token.id = REAL;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "string")==0){
+					token.id = STRING;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "matrix")==0){
+					token.id = MATRIX;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "if")==0){
+					token.id = IF ;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "else")==0){
+					token.id = ELSE;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "endif")==0){
+					token.id = ENDIF;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "read")==0){
+					token.id = READ;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "print")==0){
+					token.id = PRINT;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(strcmp(lexeme, "function")==0){
+					token.id = FUNCTION;
+					token.lineNo = lineNo;
+					index = 0;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else{
+					state = 47;
+					index = 0;
+					token.id = ID;
+					token.lineNo = lineNo;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+
 				break;
 
 			default:
