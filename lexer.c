@@ -40,16 +40,16 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 	tokenInfo token;
 	int index = 0;
 	int error = 0;
-	token.value = (char*) malloc(sizeof(char)*k);
-	state = 1;
-	char* lex = (char*) malloc(sizeof(char)*k);
-	memset(lex, 0, sizeof(lex));
+	state = 0; //starting state
+	token.value = (char*) malloc(sizeof(char)*k);	
+	char* lexeme = (char*) malloc(sizeof(char)*k);
+	memset(lexeme, 0, sizeof(lexeme));
 
 	while(1){
 		if(offset == k || buff[offset] == '\0' || strlen(buff) == 0){
 			if(feof(fp)){
 				token.value = "$";
-				token.id = 1;
+				token.id = ENDOFINPUT;
 				token.lineNo = lineNo;
 				return token;
 			}
@@ -58,85 +58,1103 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 			offset = 0;
 		}
 		switch(state){
+			case 0:
+				switch(buff[offset]){
+					case '\t':
+					case ' ':
+					case '\r':
+						state = 0;
+						offset++;
+						break;
+					
+					case '\n':
+						state = 0;
+						lineNo++;
+						offset++;
+						break;
+
+					case '#':
+						state = 6;
+						offset++;
+						break;
+					
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 36;
+						lexeme[index++] = buff[offset++];
+						break;
+					
+					case '=':
+						state = 1;
+						lexeme[index++] = buff[offset++];
+						break;
+					
+					case '[':
+						state = 7;
+						offset++;
+						token.id = SQO;
+						token.lineNo = lineNo;
+						token.value = "[";
+						return token;
+
+					case ']':
+						state = 8;
+						offset++;
+						token.id = SQC;
+						token.lineNo = lineNo;
+						token.value = "]";
+						return token;
+					
+					case '.':
+						state = 9;
+						lexeme[index++] = buff[offset++];
+						break;
+					
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+						state = 46;
+						lexeme[index++] = buff[offset++];
+						break;
+
+					case ')':
+						state = 22;
+						offset++;
+						token.id = CL;
+						token.lineNo = lineNo;
+						token.value = ")";
+						return token;
+
+					case '(':
+						state = 21;
+						offset++;
+						token.id = OP;
+						token.lineNo = lineNo;
+						token.value = "(";
+						return token;
+
+					case '<':
+						state = 23;
+						lexeme[index++] = buff[offset++];
+						break;
+
+					case ';':
+						state = 26;
+						offset++;
+						token.id = SEMICOLON;
+						token.lineNo = lineNo;
+						token.value = ";";
+						return token;
+
+					case ',':
+						state = 27;
+						offset++;
+						token.id = COMMA;
+						token.lineNo = lineNo;
+						token.value = ",";
+						return token;
+
+					case '>':
+						state = 28;
+						lexeme[index++] = buff[offset++];
+						break;
+
+					case '+':
+						state = 30;
+						offset++;
+						token.id = PLUS;
+						token.lineNo = lineNo;
+						token.value = "+";
+						return token;
+
+					case '-':
+						state = 32;
+						offset++;
+						token.id = MINUS;
+						token.lineNo = lineNo;
+						token.value = "-";
+						return token;
+
+					case '"':
+						state = 33;
+						lexeme[index++] = buff[offset++];
+						break;
+
+					case '*':
+						state = 41;
+						offset++;
+						token.id = MUL;
+						token.lineNo = lineNo;
+						token.value = "*";
+						return token;
+
+					case '/':
+						state = 42;
+						offset++;
+						token.id = DIV;
+						token.lineNo = lineNo;
+						token.value = "/";
+						return token;
+
+					case '_':
+						state = 43;
+						lexeme[index++] = buff[offset++];
+						break;
+
+					case '@':
+						state = 49;
+						offset++;
+						token.id = SIZE;
+						token.lineNo = lineNo;
+						token.value = "@";
+						return token;
+
+					case '\0':
+						token.id = ENDOFINPUT;
+						token.value = "$";
+						token.lineNo = lineNo;
+						return token;
+
+					default:
+						errorInLexer = 1;
+						printf("ERROR 1: UNKNOWN SYMBOL <%c> AT LINE <%d>.\n", buff[offset], lineNo);
+						error = 1;
+						offset++;
+						break;
+				}
+				break;
+			
 			case 1:
+				if(buff[offset] == '='){
+					state = 3;
+					lexeme[index++] = buff[offset++];
+					index = 0;
+					token.id = EQ;
+					token.lineNo = lineNo;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else if(buff[offset] == '/'){
+					state = 4;
+					lexeme[index++] = buff[offset++];
+				}
+				else{
+					state = 2;
+					index = 0;
+					token.id = ASSIGNOP;
+					token.lineNo = lineNo;
+					token.value = "=";
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
 				break;
-			case 2:
-				break;
-			case 3:
-				break;
+			
 			case 4:
+				if(buff[offset] == '='){
+					state = 5;
+					lexeme[index++] = buff[offset++];
+					index = 0;
+					token.id = NE;
+					token.lineNo = lineNo;
+					strcpy(token.value, lexeme);
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else{
+					lexeme[index++] = buff[offset++];
+					printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+					errorInLexer = 1;
+					error = 1;
+					break;
+				}
 				break;
-			case 5:
-				break;
+			
 			case 6:
+				while(buff[offset++] != '\n'){
+					if(offset == k || buff[offset] == '\0'){
+						if(feof(fp)){
+							break;
+						}
+						memset(buff, 0, sizeof(buff));
+						fp = getStream(fp, buff, k);
+						offset = 0;
+					}
+				}
+				token.value = "COMMENT";
+				token.id = COMMENT;
+				token.lineNo = lineNo;
+				lineNo++;
+				return token;
 				break;
-			case 7:
-				break;
-			case 8:
-				break;
+
 			case 9:
+				switch(buff[offset]){
+					case 'a':
+						lexeme[index++] = buff[offset++];
+						if(buff[offset] == 'n'){
+							lexeme[index++] = buff[offset++];
+							if(buff[offset] == 'd'){
+								lexeme[index++] = buff[offset++];
+								if(buff[offset] == '.'){
+									lexeme[index++] = buff[offset++];
+									state = 13;
+									index = 0;
+									token.id = AND;
+									token.lineNo = lineNo;
+									strcpy(token.value, lexeme);
+									memset(lexeme, 0, sizeof(lexeme));
+									return token;
+								}
+								else{
+									lexeme[index++] = buff[offset++];
+									printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+									errorInLexer = 1;
+									error = 1;
+									break;
+								}
+							}
+							else{
+								lexeme[index++] = buff[offset++];
+								printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+								errorInLexer = 1;
+								error = 1;
+								break;
+							}
+						}
+						else{
+							lexeme[index++] = buff[offset++];
+							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							errorInLexer = 1;
+							error = 1;
+							break;
+						}
+						break;
+					case 'o':
+						lexeme[index++] = buff[offset++];
+						if(buff[offset] == 'r'){
+							lexeme[index++] = buff[offset++];
+							if(buff[offset] == '.'){
+								lexeme[index++] = buff[offset++];
+								state = 16;
+								index = 0;
+								token.id = OR;
+								token.lineNo = lineNo;
+								strcpy(token.value, lexeme);
+								memset(lexeme, 0, sizeof(lexeme));
+								return token;
+							}
+							else{
+								lexeme[index++] = buff[offset++];
+								printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+								errorInLexer = 1;
+								error = 1;
+								break;
+							}
+						}
+						else{
+							lexeme[index++] = buff[offset++];
+							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							errorInLexer = 1;
+							error = 1;
+							break;
+						}
+						break;
+					case 'n':
+						lexeme[index++] = buff[offset++];
+						if(buff[offset] == 'o'){
+							lexeme[index++] = buff[offset++];
+							if(buff[offset] == 't'){
+								lexeme[index++] = buff[offset++];
+								if(buff[offset] == '.'){
+									lexeme[index++] = buff[offset++];
+									state = 20;
+									index = 0;
+									token.id = NOT;
+									token.lineNo = lineNo;
+									strcpy(token.value, lexeme);
+									memset(lexeme, 0, sizeof(lexeme));
+									return token;
+								}
+								else{
+									lexeme[index++] = buff[offset++];
+									printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+									errorInLexer = 1;
+									error = 1;
+									break;
+								}
+							}
+							else{
+								lexeme[index++] = buff[offset++];
+								printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+								errorInLexer = 1;
+								error = 1;
+								break;
+							}
+						}
+						else{
+							lexeme[index++] = buff[offset++];
+							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							errorInLexer = 1;
+							error = 1;
+							break;
+						}
+						break;
+				}
 				break;
-			case 10:
-				break;
-			case 11:
-				break;
-			case 12:
-				break;
-			case 13:
-				break;
-			case 14:
-				break;
-			case 15:
-				break;
-			case 16:
-				break;
-			case 17:
-				break;
-			case 18:
-				break;
-			case 19:
-				break;
-			case 20:
-				break;
-			case 21:
-				break;
-			case 22:
-				break;
+			
 			case 23:
+				if(buff[offset] == '='){
+					state = 25;
+					offset++;
+					index = 0;
+					token.id = LE;
+					token.lineNo = lineNo;
+					token.value = "<=";
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else{
+					state = 24;
+					index = 0;
+					token.id = LT;
+					token.lineNo = lineNo;
+					token.value = "<";
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
 				break;
-			case 24:
-				break;	
-			case 25:
-				break;
-			case 26:
-				break;
-			case 27:
-				break;
+			
 			case 28:
+				if(buff[offset] == '='){
+					state = 31;
+					offset++;
+					index = 0;
+					token.id = GE;
+					token.lineNo = lineNo;
+					token.value = ">=";
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
+				else{
+					state = 29;
+					index = 0;
+					token.id = GT;
+					token.lineNo = lineNo;
+					token.value = ">";
+					memset(lexeme, 0, sizeof(lexeme));
+					return token;
+				}
 				break;
-			case 29:
-				break;
-			case 30:
-				break;
-			case 31:
-				break;
-			case 32:
-				break;
+			
 			case 33:
+				switch(buff[offset]){
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case ' ':
+						lexeme[index++] = buff[offset++];
+						state = 34;
+						break;
+					default:
+						lexeme[index++] = buff[offset++];
+						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						errorInLexer = 1;
+						error = 1;
+						break;
+				}
 				break;
+
+			//handle the case when entire string is not in buffer
 			case 34:
+				switch(buff[offset]){
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case ' ':
+						lexeme[index++] = buff[offset++];
+						state = 34;
+						break;
+					case '"':
+						state = 35;
+						lexeme[index++] = buff[offset++];
+						index = 0;
+						token.id = STR;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+
+					default:
+						lexeme[index++] = buff[offset++];
+						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						errorInLexer = 1;
+						error = 1;
+						break;
+				}
 				break;
-			case 35:
-				break;
+
 			case 36:
+				switch(buff[offset]){
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 36;
+						lexeme[index++] = buff[offset++];
+						break;
+					case '.':
+						state = 38;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						state = 37;
+						index = 0;
+						token.id = NUM;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+				}
 				break;
-			case 37:
-				break;
+			
 			case 38:
+				switch(buff[offset]){
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 39;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						lexeme[index++] = buff[offset++];
+						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						errorInLexer = 1;
+						error = 1;
+						break;
+				}
 				break;
+			
 			case 39:
+				switch(buff[offset]){
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 40;
+						lexeme[index++] = buff[offset++];
+						index = 0;
+						token.id = RNUM;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+					default:
+						lexeme[index++] = buff[offset++];
+						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						errorInLexer = 1;
+						error = 1;
+						break;
+				}
 				break;
-			case 40:
+			
+			case 43:
+				switch(buff[offset]){
+					case 'm':
+						lexeme[index++] = buff[offset++];
+						state = 50;
+						break;
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					//case m:
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+						state = 51;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						lexeme[index++] = buff[offset++];
+						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						errorInLexer = 1;
+						error = 1;
+						break;
+				}
+				break;
+			case 50:
+				switch(buff[offset]){
+					case 'a':
+						lexeme[index++] = buff[offset++];
+						state = 52;
+						break;
+					//case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 51;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						state = 56;
+						index = 0;
+						token.id = FUNID;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+				}
+				break;
+			case 52:
+				switch(buff[offset]){
+					case 'i':
+						lexeme[index++] = buff[offset++];
+						state = 53;
+						break;
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					//case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 51;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						state = 56;
+						index = 0;
+						token.id = FUNID;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+				}
+				break;
+			case 53:
+				switch(buff[offset]){
+					case 'n':
+						lexeme[index++] = buff[offset++];
+						state = 54;
+						break;
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					//case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 51;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						state = 56;
+						index = 0;
+						token.id = FUNID;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+				}
+				break;
+			case 54:
+				switch(buff[offset]){
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 51;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						state = 55;
+						index = 0;
+						token.id = MAIN;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+				}
+				break;
+			case 51:
+				switch(buff[offset]){
+					case 'a':
+					case 'b':
+					case 'c':
+					case 'd':
+					case 'e':
+					case 'f':
+					case 'g':
+					case 'h':
+					case 'i':
+					case 'j':
+					case 'k':
+					case 'l':
+					case 'm':
+					case 'n':
+					case 'o':
+					case 'p':
+					case 'q':
+					case 'r':
+					case 's':
+					case 't':
+					case 'u':
+					case 'v':
+					case 'w':
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'A':
+					case 'B':
+					case 'C':
+					case 'D':
+					case 'E':
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'I':
+					case 'J':
+					case 'K':
+					case 'L':
+					case 'M':
+					case 'N':
+					case 'O':
+					case 'P':
+					case 'Q':
+					case 'R':
+					case 'S':
+					case 'T':
+					case 'U':
+					case 'V':
+					case 'W':
+					case 'X':
+					case 'Y':
+					case 'Z':
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						state = 51;
+						lexeme[index++] = buff[offset++];
+						break;
+					default:
+						state = 56;
+						index = 0;
+						token.id = FUNID;
+						token.lineNo = lineNo;
+						strcpy(token.value, lexeme);
+						memset(lexeme, 0, sizeof(lexeme));
+						return token;
+						break;
+				}
+				break;
+			case 46:
+			
 				break;
 
 			default:
