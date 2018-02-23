@@ -546,7 +546,6 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 				}
 				break;
 
-			//handle the case when entire string is not in buffer
 			case 34:
 				switch(buff[offset]){
 					case 'a':
@@ -591,10 +590,21 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 
 					default:
 						lexeme[index++] = buff[offset++];
-						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
-						errorInLexer = 1;
-						error = 1;
-						break;
+						if (offset == k || buff[offset] == '\0'){
+							if (feof(fp)){
+								break;
+							}
+							memset(buff, 0, sizeof(buff));
+							fp = getStream(fp, buff, k);
+							offset = 0;
+							break;
+						}
+						else{
+							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							errorInLexer = 1;
+							error = 1;
+							break;
+						}
 				}
 				break;
 
@@ -1278,7 +1288,8 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 				break;
 
 			default:
-				return;
+				printf("ERROR: WRONG STATE");
+				break;
 
 		}
 	}
