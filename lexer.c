@@ -168,6 +168,8 @@ void removeComments(char *testcaseFile)
 	ssize_t read;
 
 	while((read = getline(&line, &len, fp)) != -1){
+		if(line[0] == '\n' || line[0] == '#')
+			continue;
 		int i = 0;
 		while((i != read) && (line[i] != '#')){
 			i++;
