@@ -10,7 +10,7 @@ FILE *getStream(FILE *fp, buffer buff, bufferSize k);
 
 tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k);
 
-void removeComments(char *testcaseFile, char *cleanFile);
+void removeComments(char *testcaseFile);
 
 int errorInLexer;
 
