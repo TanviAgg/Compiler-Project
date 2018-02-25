@@ -6,6 +6,13 @@
 #ifndef PARSERDEF_H
 #define PARSERDEF_H
 
+int numberTerminals = 39;
+int numberNonterminals = 44;
+int FirstsTable[numberTerminals+numberNonterminals+1][numberTerminals+1];  //extra for eps
+int FollowsTable[numberNonterminals][numberTerminals];
+int *ParseTable[numberNonterminals][numberTerminals+1];
+
+
 struct stack;
 typedef struct stack stack;
 struct stack{

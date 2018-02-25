@@ -5,6 +5,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+void createFirstSet(char *firstsFile, char **firstTable);
+
 void createParseTable(FILE *G, table T);
 
 parseTree parseInputSourceCode(char *testcaseFile, table T);
