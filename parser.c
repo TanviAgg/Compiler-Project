@@ -247,7 +247,43 @@ void createFollowSet(char *followsFile, int FollowsTable[][numberTerminals])
 		}
 	}	
 }
-void readGrammar(char *grammarFile, node grammar[]);
+void readGrammar(char *grammarFile, node grammar[])
+{
+	FILE* fp = fopen(grammarFile, "r");
+	if(fp == NULL)
+		printf("Invalid file\n");
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
+	char *token;
+	int nodeIndex = 0;
+	int i, j;
+	node *newNode, *newNode2;
+	while((read = getdelim(&line, &len, ';',fp)) != -1){
+		token = strtok(line, ",");
+		i = termToID(token);
+		grammar[nodeIndex].data = i;
+		token = strtok(NULL,",");
+		j = termToID(token);
+		if( j >= 0){
+			newNode = (node*)malloc(sizeof(node));
+			newNode->data = j;
+			grammar[nodeIndex++].next = newNode;
+		}			
+		token = strtok(NULL,",");
+
+		while(token){
+			j = termToID(token);
+			if( j >= 0){
+				newNode2 = (node*)malloc(sizeof(node));
+				newNode2->data = j;
+				newNode->next = newNode2;
+				newNode = newNode2;
+			}			
+			token = strtok(NULL,",");
+		}
+	}	
+}
 /*
 
 void createParseTable(FirstAndFollow F, table T): This function takes as input the FIRST and FOLLOW information above to populate the parse table T appropriately. Hand coded parse table will not be accepted.
@@ -277,21 +313,33 @@ The lexeme of the current node is printed when it is the leaf node else a dummy 
 */
 void main(){
 	//printf("%d", terminalToID("SQO"));
-	createFirstSet("firsts.txt", FirstsTable);
-	createFollowSet("follows.txt", FollowsTable);
-	int i, j;
-	for(i = 0; i < 84; i++ ){
-		printf("%d:",i);
-		for(j = 0; j<40; j++)
-			if(FirstsTable[i][j]==1)
-			printf("%d,",j);
-		printf("\n");
-	}
-	for(i = 0; i < 44; i++ ){
-		printf("%d:",i);
-		for(j = 0; j<39; j++)
-			if(FollowsTable[i][j]==1)
-			printf("%d,",j);
+	//createFirstSet("firsts.txt", FirstsTable);
+	//createFollowSet("follows.txt", FollowsTable);
+	// int i, j;
+	// for(i = 0; i < 84; i++ ){
+	// 	printf("%d:",i);
+	// 	for(j = 0; j<40; j++)
+	// 		if(FirstsTable[i][j]==1)
+	// 		printf("%d,",j);
+	// 	printf("\n");
+	// }
+	// for(i = 0; i < 44; i++ ){
+	// 	printf("%d:",i);
+	// 	for(j = 0; j<39; j++)
+	// 		if(FollowsTable[i][j]==1)
+	// 		printf("%d,",j);
+	// 	printf("\n");
+	// }
+	readGrammar("grammar.txt", grammar);
+	int i;
+	node* temp;
+	for(i = 0; i < numberRules; i++){
+		printf("%d->",grammar[i].data);
+		temp = grammar[i].next;
+		while(temp){
+			printf("%d,",temp->data);
+			temp = temp->next;
+		}
 		printf("\n");
 	}
 	return;
