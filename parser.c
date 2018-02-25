@@ -204,20 +204,22 @@ void createFirstSet(char *firstsFile, int FirstsTable[][numberTerminals+1])
 
 	int i, j;
 
-	while((read = getline(&line, &len, fp)) != -1){
-		token = strtok(line, " ");
-		i = nonterminalToID(token);
-		token = strtok(NULL," ");
+	while((read = getdelim(&line, &len,';', fp)) != -1){
+		token = strtok(line, ",");
+		i = termToID(token);
+		token = strtok(NULL,",");
 
 		while(token){
-			j = terminalToID(token);
-			FirstsTable[i][j] = 1;
-			token = strtok(NULL," ");
+			j = termToID(token)-44;
+			printf("%d, |%s|...", j, token);
+			if(j >= 0)
+				FirstsTable[i][j] = 1;
+			token = strtok(NULL,",");
 		}
 	}
-	for(i = 44; i<84; i++){
-		FirstsTable[i][i-44] = 1;
-	}		
+	// for(i = 44; i<84; i++){
+	// 	FirstsTable[i][i-44] = 1;
+	// }		
 }
 void createFollowSet(char *followsFile, int FollowsTable[][numberTerminals])
 {
@@ -232,15 +234,16 @@ void createFollowSet(char *followsFile, int FollowsTable[][numberTerminals])
 
 	int i, j;
 
-	while((read = getline(&line, &len, fp)) != -1){
-		token = strtok(line, " ");
-		i = nonterminalToID(token);
-		token = strtok(NULL," ");
+	while((read = getdelim(&line, &len, ';',fp)) != -1){
+		token = strtok(line, ",");
+		i = termToID(token);
+		token = strtok(NULL,",");
 
 		while(token){
-			j = terminalToID(token);
-			FollowsTable[i][j] = 1;
-			token = strtok(NULL," ");
+			j = termToID(token)-44;
+			if(j>=0)
+				FollowsTable[i][j] = 1;
+			token = strtok(NULL,",");
 		}
 	}	
 }
