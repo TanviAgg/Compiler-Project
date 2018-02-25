@@ -1,5 +1,5 @@
 mainFunction => MAIN SQO SQC stmtsAndFunctionDefs END
-stmtsAndFuntionDefs => stmtOrFunctionDef moreStmtAndFunctionDefs
+stmtsAndFunctionDefs => stmtOrFunctionDef moreStmtAndFunctionDefs
 moreStmtAndFunctionDefs => stmtOrFunctionDef stmtsAndFunctionDefs 
 moreStmtAndFunctionDefs => eps
 stmtOrFunctionDef => stmt 
@@ -49,7 +49,7 @@ arithmeticExpression => arithmeticTerm arithmeticExp
 arithmeticExp => operator_lowPrecedence arithmeticExpression
 arithmeticExp => eps
 arithmeticTerm => factor arithmeticT
-arithmeticT => operator_highPrecdence arithmeticTerm 
+arithmeticT => operator_highPrecedence arithmeticTerm 
 arithmeticT => eps
 factor => OP arithmeticExpression CL 
 factor => var
