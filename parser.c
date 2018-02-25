@@ -289,7 +289,26 @@ void readGrammar(char *grammarFile, node grammar[])
 void createParseTable(FirstAndFollow F, table T): This function takes as input the FIRST and FOLLOW information above to populate the parse table T appropriately. Hand coded parse table will not be accepted.
 
 */
-
+void createParseTable(int ParseTable[][numberTerminals])
+{
+	int i, j;
+	for(i = 0; i < numberRules; i++){
+		if(grammar[i].next->data != 83){
+			for(j = 0; j < numberTerminals; j++){
+				if(FirstsTable[grammar[i].next->data][j] == 1){
+					ParseTable[grammar[i].data][j] = i;
+				}
+			}
+		}
+		else{
+			for(j = 0; j < numberTerminals; j++){
+				if(FollowsTable[grammar[i].data][j] == 1){
+					ParseTable[grammar[i].data][j] = i;
+				}
+			}
+		}
+	}
+}
 /*
 
 parseTree   parseInputSourceCode(char *testcaseFile, table T): This function takes as input the source code file and parses using the rules as per the predictive parse table T. The function gets the tokens using lexical analysis interface and establishes the syntactic structure of the input source code using rules in T. The function must report all errors appropriately if the source code is syntactically incorrect. Error recovery must be implemented to list all errors. Parsers which report one error at a time and quit before listing all errors are considered bad, therefore students are advised to implement error recovery appropriately.
@@ -313,25 +332,29 @@ The lexeme of the current node is printed when it is the leaf node else a dummy 
 */
 void main(){
 	//printf("%d", terminalToID("SQO"));
-	//createFirstSet("firsts.txt", FirstsTable);
-	//createFollowSet("follows.txt", FollowsTable);
-	// int i, j;
-	// for(i = 0; i < 84; i++ ){
-	// 	printf("%d:",i);
-	// 	for(j = 0; j<40; j++)
-	// 		if(FirstsTable[i][j]==1)
-	// 		printf("%d,",j);
-	// 	printf("\n");
-	// }
-	// for(i = 0; i < 44; i++ ){
-	// 	printf("%d:",i);
-	// 	for(j = 0; j<39; j++)
-	// 		if(FollowsTable[i][j]==1)
-	// 		printf("%d,",j);
-	// 	printf("\n");
-	// }
+	createFirstSet("firsts.txt", FirstsTable);
+	createFollowSet("follows.txt", FollowsTable);
+	int i, j;
+	for(i = 0; i < 84; i++ ){
+		printf("%d:",i);
+		for(j = 0; j<40; j++)
+			if(FirstsTable[i][j]==1)
+			printf("%d,",j);
+		printf("\n");
+	}
+	printf("\n");
+	printf("\n");
+	for(i = 0; i < 44; i++ ){
+		printf("%d:",i);
+		for(j = 0; j<39; j++)
+			if(FollowsTable[i][j]==1)
+			printf("%d,",j);
+		printf("\n");
+	}
+	printf("\n");
+	printf("\n");
 	readGrammar("grammar.txt", grammar);
-	int i;
+	//int i,j;
 	node* temp;
 	for(i = 0; i < numberRules; i++){
 		printf("%d->",grammar[i].data);
@@ -340,6 +363,15 @@ void main(){
 			printf("%d,",temp->data);
 			temp = temp->next;
 		}
+		printf("\n");
+	}
+	printf("\n");
+	printf("\n");
+	createParseTable(ParseTable);
+	for(i = 0; i < 44; i++ ){
+		printf("%d:",i);
+		for(j = 0; j<39; j++)
+			printf("%d,",ParseTable[i][j]);
 		printf("\n");
 	}
 	return;
