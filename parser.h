@@ -5,13 +5,16 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-void createFirstSet(char *firstsFile, char **firstTable);
+#include "parserDef.h"
 
-void createParseTable(FILE *G, table T);
+void createFirstSet(char *firstsFile, int FirstsTable[][numberTerminals+1]);
+void createFollowSet(char *followsFile, int FollowsTable[][numberTerminals]);
+void readGrammar(char *grammarFile, node grammar[]);
+void createParseTable(int ParseTable[][numberTerminals]);
 
-parseTree parseInputSourceCode(char *testcaseFile, table T);
+//parseTree parseInputSourceCode(char *testcaseFile, int ParseTable[][numberTerminals]);
 
-void printParseTree(parseTree PT, char *outfile);
+//void printParseTree(parseTree PT, char *outfile);
 
 int errorInParser;
 

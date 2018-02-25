@@ -296,19 +296,32 @@ void createParseTable(int ParseTable[][numberTerminals])
 		if(grammar[i].next->data != 83){
 			for(j = 0; j < numberTerminals; j++){
 				if(FirstsTable[grammar[i].next->data][j] == 1){
-					ParseTable[grammar[i].data][j] = i;
+					ParseTable[grammar[i].data][j] = i+1;
 				}
 			}
 		}
 		else{
 			for(j = 0; j < numberTerminals; j++){
 				if(FollowsTable[grammar[i].data][j] == 1){
-					ParseTable[grammar[i].data][j] = i;
+					ParseTable[grammar[i].data][j] = i+1;
 				}
 			}
 		}
 	}
 }
+
+stack* pop(stack *st){
+	stack *temp = st;
+	st = st->next;
+	return temp;
+}
+stack *push(stack *st, int lhs){
+	stack *newNode = (stack *)malloc(sizeof(stack));
+	newNode->data = lhs;
+	newNode->next = st;
+	st = newNode;
+}
+stack *push_rhs(stack *, int *, parseTree);
 /*
 
 parseTree   parseInputSourceCode(char *testcaseFile, table T): This function takes as input the source code file and parses using the rules as per the predictive parse table T. The function gets the tokens using lexical analysis interface and establishes the syntactic structure of the input source code using rules in T. The function must report all errors appropriately if the source code is syntactically incorrect. Error recovery must be implemented to list all errors. Parsers which report one error at a time and quit before listing all errors are considered bad, therefore students are advised to implement error recovery appropriately.

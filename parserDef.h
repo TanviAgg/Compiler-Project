@@ -5,23 +5,26 @@
 
 #ifndef PARSERDEF_H
 #define PARSERDEF_H
+#define numberNonterminals 44
+#define numberTerminals 39 //exclusing eps, including ENDOFINPUT
+#define numberRules 87
 
-int numberTerminals = 39;
-int numberNonterminals = 44;
 int FirstsTable[numberTerminals+numberNonterminals+1][numberTerminals+1];  //extra for eps
 int FollowsTable[numberNonterminals][numberTerminals];
-int *ParseTable[numberNonterminals][numberTerminals+1];
+int ParseTable[numberNonterminals][numberTerminals];
 
-
-struct stack;
-typedef struct stack stack;
-struct stack{
+struct node;
+typedef struct node stack;
+typedef struct node node;
+struct node{
 	int data;
-	stack *next;
+	node *next;
 };
+
+node grammar[numberRules];
 
 stack pop(stack *);
 stack *push(stack *, int);
-stack *push_ints(stack *, int *, parseTree);
+stack *push_rhs(stack *, int *, parseTree);
 
 #endif
