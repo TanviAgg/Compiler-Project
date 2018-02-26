@@ -509,6 +509,17 @@ void main(){
 	}
 	printf("\n");
 	printf("\n");
+	//parseInputSourceCode("revised_testcases/testcase1.txt");
+	// printf("Testcase 1\n");
+
+	// parseInputSourceCode("revised_testcases/testcase2.txt");
+	// printf("Testcase 2\n");
+	// parseInputSourceCode("revised_testcases/testcase3.txt");
+	// printf("Testcase 3\n");
+	// parseInputSourceCode("revised_testcases/testcase4.txt");
+	// printf("Testcase 4\n");
+	// parseInputSourceCode("revised_testcases/testcase5.txt");
+	// printf("Testcase 5\n");
 	parseInputSourceCode("testing.txt");
 	return;
 }
