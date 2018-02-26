@@ -207,18 +207,20 @@ void createFirstSet(char *firstsFile, int FirstsTable[][numberTerminals+1])
 	int i, j;
 
 	while((read = getdelim(&line, &len,';', fp)) != -1){
+		// printf("line--%s\n",line);
 		token = strtok(line, ",");
 		i = termToID(token);
 		token = strtok(NULL,",");
 
 		while(token){
 			j = termToID(token)-44;
-			printf("%d, |%s|...", j, token);
+			// printf("%d, %s\n", j, token);
 			if(j >= 0)
 				FirstsTable[i][j] = 1;
 			token = strtok(NULL,",");
 		}
 	}
+	fclose(fp);
 	// for(i = 44; i<84; i++){
 	// 	FirstsTable[i][i-44] = 1;
 	// }		
@@ -237,6 +239,7 @@ void createFollowSet(char *followsFile, int FollowsTable[][numberTerminals])
 	int i, j;
 
 	while((read = getdelim(&line, &len, ';',fp)) != -1){
+		// printf("line--%s\n",line);
 		token = strtok(line, ",");
 		i = termToID(token);
 		token = strtok(NULL,",");
@@ -248,6 +251,7 @@ void createFollowSet(char *followsFile, int FollowsTable[][numberTerminals])
 			token = strtok(NULL,",");
 		}
 	}	
+	fclose(fp);
 }
 void readGrammar(char *grammarFile, node grammar[])
 {
@@ -262,6 +266,7 @@ void readGrammar(char *grammarFile, node grammar[])
 	int i, j;
 	node *newNode, *newNode2;
 	while((read = getdelim(&line, &len, ';',fp)) != -1){
+		// printf("line--%s\n",line);
 		token = strtok(line, ",");
 		i = termToID(token);
 		grammar[nodeIndex].data = i;
@@ -284,7 +289,8 @@ void readGrammar(char *grammarFile, node grammar[])
 			}			
 			token = strtok(NULL,",");
 		}
-	}	
+	}
+	fclose(fp);	
 }
 /*
 
@@ -382,10 +388,10 @@ void parseInputSourceCode(char *testcaseFile){
 	FILE *fp = fopen(testcaseFile, "r");
 	int temp;
 	tokenInfo L = getNextToken(fp, b, k); //getNextToken returns terminals between 0-39
-	printf("Token - %d, %s\n",L.id, L.value);
+	// printf("Token - %d, %s\n",L.id, L.value);
 	push(termToID("ENDOFINPUT"));
 	push(termToID("mainFunction"));
-	printStack();
+	// printStack();
 
 	while(L.id != (termToID("ENDOFINPUT")-44)){
 		if(top->data < 44){
@@ -393,10 +399,10 @@ void parseInputSourceCode(char *testcaseFile){
 				temp =  pop();
 				if(grammar[ParseTable[temp][L.id]-1].next->data != termToID("eps"))
 					push_rhs(ParseTable[temp][L.id]-1);
-				printStack();
+				// printStack();
 			}
 			else{
-				printStack();
+				// printStack();
 				printf("ERROR IN PARSING...No rule available\n");
 				errorInParser = 1;
 				return;
@@ -405,25 +411,25 @@ void parseInputSourceCode(char *testcaseFile){
 		else if((top->data >= 44) && (top->data != termToID("ENDOFINPUT"))){
 			if((top->data - 44) == L.id){
 				temp = pop();
-				printStack();
+				// printStack();
 				L = getNextToken(fp, b, k);
-				printf("Token - %d, %s\n",L.id, L.value);
+				// printf("Token - %d, %s\n",L.id, L.value);
 
 				//ignore Comment token
 				while(L.id == 39){
 					L = getNextToken(fp, b, k);
-					printf("Token - %d, %s\n",L.id, L.value);
+					// printf("Token - %d, %s\n",L.id, L.value);
 				}
 			}
 			else{
-				printStack();
+				// printStack();
 				printf("ERROR IN PARSING...%d not equal to %d.\n", top->data-44,L.id);
 				errorInParser = 1;
 				return;
 			}
 		}
 		else if(top->data == termToID("ENDOFINPUT")){
-			printStack();
+			// printStack();
 			printf("ERROR IN PARSING...Reached bottom of stack.\n");
 			errorInParser = 1;
 			return;
@@ -432,15 +438,16 @@ void parseInputSourceCode(char *testcaseFile){
 	}
 	if((L.id == (termToID("ENDOFINPUT")-44)) && (top->data != termToID("ENDOFINPUT"))){
 		printf("ERROR IN PARSING...Stack not empty.\n");
-		printStack();
+		// printStack();
 		errorInParser = 1;
 		return;
 	}
 	else if((L.id == (termToID("ENDOFINPUT")-44)) && (top->data == termToID("ENDOFINPUT"))){
 		printf("Successful Compilation.\n");
-		printStack();
+		// printStack();
 		return;
 	}
+	fclose(fp);
 }
 /*
 
@@ -463,63 +470,63 @@ isLeafNode(yes/no) NodeSymbol
 The lexeme of the current node is printed when it is the leaf node else a dummy string of characters "‐‐‐‐" is printed. The line number is one of the information collected by the lexical analyzer during single pass of the source code. The token name corresponding to the current node is printed third. If the lexeme is an integer or real number, then its value computed by the lexical analyzer should be printed at the fourth place. Print the grammar symbol (non terminal symbol) of the parent node of the currently visited node appropriately at fifth place (for the root node print ROOT for parent symbol) . The sixth column is for printing yes or no appropriately. Print the non terminal symbol of the node being currently visited at the 7th place, if the node is not the leaf node [Print the actual nonterminal symbol and not the enumerated values for the nonterminal]. Ensure appropriate justification so that the columns appear neat and straight. 
 
 */
-void main(){
-	//printf("%d", terminalToID("SQO"));
-	createFirstSet("firsts.txt", FirstsTable);
-	createFollowSet("follows.txt", FollowsTable);
-	int i, j;
-	for(i = 0; i < 84; i++ ){
-		printf("%d:",i);
-		for(j = 0; j<40; j++)
-			if(FirstsTable[i][j]==1)
-			printf("%d,",j);
-		printf("\n");
-	}
-	printf("\n");
-	printf("\n");
-	for(i = 0; i < 44; i++ ){
-		printf("%d:",i);
-		for(j = 0; j<39; j++)
-			if(FollowsTable[i][j]==1)
-			printf("%d,",j);
-		printf("\n");
-	}
-	printf("\n");
-	printf("\n");
-	readGrammar("grammar.txt", grammar);
-	//int i,j;
-	node* temp;
-	for(i = 0; i < numberRules; i++){
-		printf("%d->",grammar[i].data);
-		temp = grammar[i].next;
-		while(temp){
-			printf("%d,",temp->data);
-			temp = temp->next;
-		}
-		printf("\n");
-	}
-	printf("\n");
-	printf("\n");
-	createParseTable(ParseTable);
-	for(i = 0; i < 44; i++ ){
-		printf("%d:",i);
-		for(j = 0; j<39; j++)
-			printf("%d,",ParseTable[i][j]);
-		printf("\n");
-	}
-	printf("\n");
-	printf("\n");
-	//parseInputSourceCode("revised_testcases/testcase1.txt");
-	// printf("Testcase 1\n");
+// void main(){
+// 	//printf("%d", terminalToID("SQO"));
+// 	createFirstSet("Ffirsts.txt", FirstsTable);
+// 	createFollowSet("Ffollows.txt", FollowsTable);
+// 	int i, j;
+// 	for(i = 0; i < 84; i++ ){
+// 		printf("%d:",i);
+// 		for(j = 0; j<40; j++)
+// 			if(FirstsTable[i][j]==1)
+// 			printf("%d,",j);
+// 		printf("\n");
+// 	}
+// 	printf("\n");
+// 	printf("\n");
+// 	for(i = 0; i < 44; i++ ){
+// 		printf("%d:",i);
+// 		for(j = 0; j<39; j++)
+// 			if(FollowsTable[i][j]==1)
+// 			printf("%d,",j);
+// 		printf("\n");
+// 	}
+// 	printf("\n");
+// 	printf("\n");
+// 	readGrammar("Fgrammar.txt", grammar);
+// 	// int i,j;
+// 	node* temp;
+// 	for(i = 0; i < numberRules; i++){
+// 		printf("%d->",grammar[i].data);
+// 		temp = grammar[i].next;
+// 		while(temp){
+// 			printf("%d,",temp->data);
+// 			temp = temp->next;
+// 		}
+// 		printf("\n");
+// 	}
+// 	printf("\n");
+// 	printf("\n");
+// 	createParseTable(ParseTable);
+// 	for(i = 0; i < 44; i++ ){
+// 		printf("%d:",i);
+// 		for(j = 0; j<39; j++)
+// 			printf("%d,",ParseTable[i][j]);
+// 		printf("\n");
+// 	}
+// 	printf("\n");
+// 	printf("\n");
+// 	 // parseInputSourceCode("revised_testcases/testcase5.txt");
+// 	// printf("Testcase 1\n");
 
-	// parseInputSourceCode("revised_testcases/testcase2.txt");
-	// printf("Testcase 2\n");
-	// parseInputSourceCode("revised_testcases/testcase3.txt");
-	// printf("Testcase 3\n");
-	// parseInputSourceCode("revised_testcases/testcase4.txt");
-	// printf("Testcase 4\n");
-	// parseInputSourceCode("revised_testcases/testcase5.txt");
-	// printf("Testcase 5\n");
-	parseInputSourceCode("testing.txt");
-	return;
-}
+// 	// parseInputSourceCode("revised_testcases/testcase2.txt");
+// 	// printf("Testcase 2\n");
+// 	// parseInputSourceCode("revised_testcases/testcase3.txt");
+// 	// printf("Testcase 3\n");
+// 	// parseInputSourceCode("revised_testcases/testcase4.txt");
+// 	// printf("Testcase 4\n");
+// 	// parseInputSourceCode("revised_testcases/testcase5.txt");
+// 	// printf("Testcase 5\n");
+// 	parseInputSourceCode("testing.txt");
+// 	return;
+// }

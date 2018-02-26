@@ -7,7 +7,7 @@
 #define PARSERDEF_H
 #define numberNonterminals 44
 #define numberTerminals 39 //exclusing eps, including ENDOFINPUT
-#define numberRules 87
+#define numberRules 86
 
 int FirstsTable[numberTerminals+numberNonterminals+1][numberTerminals+1];  //extra for eps
 int FollowsTable[numberNonterminals][numberTerminals];
