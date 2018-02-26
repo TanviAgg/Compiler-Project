@@ -5,6 +5,8 @@
 #include <string.h>
 #include "parser.h"
 #include "parserDef.h"
+#include "lexer.h"
+//#include "lexer.c"
 
 /*
 
@@ -310,18 +312,136 @@ void createParseTable(int ParseTable[][numberTerminals])
 	}
 }
 
-stack* pop(stack *st){
-	stack *temp = st;
-	st = st->next;
-	return temp;
+// stack* pop(stack *st){
+// 	stack *temp = st;
+// 	st = st->next;
+// 	return temp;
+// }
+// stack *push(stack *st, int lhs){
+// 	stack *newNode = (stack *)malloc(sizeof(stack));
+// 	newNode->data = lhs;
+// 	newNode->next = st;
+// 	st = newNode;
+// }
+// stack *push_rhs(stack *, int *, parseTree);
+
+int pop(){
+	int v;
+	stack *temp;
+	if(top==NULL){
+		printf("stack is empty!");
+		return 0;
+	}
+	else{
+		v = top->data;
+		temp = top;
+		top = top->next;
+		free(temp);
+		return v;
+	}
 }
-stack *push(stack *st, int lhs){
-	stack *newNode = (stack *)malloc(sizeof(stack));
-	newNode->data = lhs;
-	newNode->next = st;
-	st = newNode;
+void push(int val){
+	stack *temp;
+	temp = (stack *)malloc(sizeof(stack));
+
+	temp->data = val;
+	temp->next = top;
+	top = temp;
 }
-stack *push_rhs(stack *, int *, parseTree);
+void push_rhs(int rule){
+	stack *temp, *temp2, *firstRule, *temp3;
+	temp = (stack *)malloc(sizeof(stack));
+	temp->data = grammar[rule].next->data;
+	temp2 = grammar[rule].next->next;
+	firstRule = temp;
+	while(temp2){
+		temp3 = (stack *)malloc(sizeof(stack));
+		temp3->data = temp2->data;
+		temp3->next = temp2->next;
+		temp2 = temp2->next;
+		temp->next = temp3;
+		temp = temp3;
+	}
+	temp->next = top;
+	top = firstRule;
+}
+
+void printStack(){
+	stack * temp = top;
+	printf("Stack: ");
+	while(temp){
+		printf("%d->",temp->data);
+		temp = temp->next;
+	}
+	printf("\n");
+}
+
+void parseInputSourceCode(char *testcaseFile){
+	char* b = (char*) malloc(sizeof(char)*20);
+	int k = 20;
+	FILE *fp = fopen(testcaseFile, "r");
+	int temp;
+	tokenInfo L = getNextToken(fp, b, k); //getNextToken returns terminals between 0-39
+	printf("Token - %d, %s\n",L.id, L.value);
+	push(termToID("ENDOFINPUT"));
+	push(termToID("mainFunction"));
+	printStack();
+
+	while(L.id != (termToID("ENDOFINPUT")-44)){
+		if(top->data < 44){
+			if(ParseTable[top->data][L.id] != 0){
+				temp =  pop();
+				if(grammar[ParseTable[temp][L.id]-1].next->data != termToID("eps"))
+					push_rhs(ParseTable[temp][L.id]-1);
+				printStack();
+			}
+			else{
+				printStack();
+				printf("ERROR IN PARSING...No rule available\n");
+				errorInParser = 1;
+				return;
+			}
+		}
+		else if((top->data >= 44) && (top->data != termToID("ENDOFINPUT"))){
+			if((top->data - 44) == L.id){
+				temp = pop();
+				printStack();
+				L = getNextToken(fp, b, k);
+				printf("Token - %d, %s\n",L.id, L.value);
+
+				//ignore Comment token
+				while(L.id == 39){
+					L = getNextToken(fp, b, k);
+					printf("Token - %d, %s\n",L.id, L.value);
+				}
+			}
+			else{
+				printStack();
+				printf("ERROR IN PARSING...%d not equal to %d.\n", top->data-44,L.id);
+				errorInParser = 1;
+				return;
+			}
+		}
+		else if(top->data == termToID("ENDOFINPUT")){
+			printStack();
+			printf("ERROR IN PARSING...Reached bottom of stack.\n");
+			errorInParser = 1;
+			return;
+		}
+		
+	}
+	if((L.id == (termToID("ENDOFINPUT")-44)) && (top->data != termToID("ENDOFINPUT"))){
+		printf("ERROR IN PARSING...Stack not empty.\n");
+		printStack();
+		errorInParser = 1;
+		return;
+	}
+	else if((L.id == (termToID("ENDOFINPUT")-44)) && (top->data == termToID("ENDOFINPUT"))){
+		printf("Successful Compilation.\n");
+		printStack();
+		return;
+	}
+}
 /*
 
 parseTree   parseInputSourceCode(char *testcaseFile, table T): This function takes as input the source code file and parses using the rules as per the predictive parse table T. The function gets the tokens using lexical analysis interface and establishes the syntactic structure of the input source code using rules in T. The function must report all errors appropriately if the source code is syntactically incorrect. Error recovery must be implemented to list all errors. Parsers which report one error at a time and quit before listing all errors are considered bad, therefore students are advised to implement error recovery appropriately.
@@ -387,5 +507,8 @@ void main(){
 			printf("%d,",ParseTable[i][j]);
 		printf("\n");
 	}
+	printf("\n");
+	printf("\n");
+	parseInputSourceCode("testing.txt");
 	return;
 }

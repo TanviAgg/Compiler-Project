@@ -14,7 +14,6 @@ int FollowsTable[numberNonterminals][numberTerminals];
 int ParseTable[numberNonterminals][numberTerminals];
 
 struct node;
-typedef struct node stack;
 typedef struct node node;
 struct node{
 	int data;
@@ -23,8 +22,11 @@ struct node{
 
 node grammar[numberRules];
 
-stack pop(stack *);
-stack *push(stack *, int);
-stack *push_rhs(stack *, int *, parseTree);
+typedef struct node stack;
+
+stack *top;
+int pop();
+void push(int);
+void push_rhs(int);
 
 #endif

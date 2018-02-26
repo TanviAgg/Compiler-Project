@@ -1335,17 +1335,17 @@ void removeComments(char *testcaseFile)
 	fclose(fp);
 }
 
-void main(){
-	char* b = (char*) malloc(sizeof(char)*20);
-	int k = 20;
-	FILE *fp = fopen("testing.txt", "r");
+// void main(){
+// 	char* b = (char*) malloc(sizeof(char)*20);
+// 	int k = 20;
+// 	FILE *fp = fopen("testing.txt", "r");
 	
-	tokenInfo t = getNextToken(fp, b, k);
-	printf(" Type:%d, value: %s, line no: %d\n", t.id, t.value, t.lineNo);
-	while(t.id != 39 ){
-		t = getNextToken(fp, b, k);
-	printf(" Type:%d, value: %s, line no: %d\n", t.id, t.value, t.lineNo);
+// 	tokenInfo t = getNextToken(fp, b, k);
+// 	printf(" Type:%d, value: %s, line no: %d\n", t.id, t.value, t.lineNo);
+// 	while(t.id != 38 ){
+// 		t = getNextToken(fp, b, k);
+// 	printf(" Type:%d, value: %s, line no: %d\n", t.id, t.value, t.lineNo);
 	
-	}
-	//removeComments("testing.txt");
-}
+// 	}
+// 	//removeComments("testing.txt");
+// }
