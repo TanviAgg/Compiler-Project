@@ -136,7 +136,7 @@ void printAllTokens(char *inputfile){
 	lineNo = 1;
 	state = 0;
 	printf("------------------------------------\n");
-	printf("Token\t\tLexeme\t\tLine no.\n");
+	printf("%-20s%-20s%-10s\n","Token","Lexeme","Line no.");
 	
 	char *c = (char*)malloc(sizeof(char)*12);
 	memset(c,0,12);

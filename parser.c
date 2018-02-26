@@ -318,19 +318,6 @@ void createParseTable(int ParseTable[][numberTerminals])
 	}
 }
 
-// stack* pop(stack *st){
-// 	stack *temp = st;
-// 	st = st->next;
-// 	return temp;
-// }
-// stack *push(stack *st, int lhs){
-// 	stack *newNode = (stack *)malloc(sizeof(stack));
-// 	newNode->data = lhs;
-// 	newNode->next = st;
-// 	st = newNode;
-// }
-// stack *push_rhs(stack *, int *, parseTree);
-
 int pop(){
 	int v;
 	stack *temp;
@@ -388,10 +375,10 @@ void parseInputSourceCode(char *testcaseFile){
 	FILE *fp = fopen(testcaseFile, "r");
 	int temp;
 	tokenInfo L = getNextToken(fp, b, k); //getNextToken returns terminals between 0-39
-	// printf("Token - %d, %s\n",L.id, L.value);
+	printf("Token - %d, %s\n",L.id, L.value);
 	push(termToID("ENDOFINPUT"));
 	push(termToID("mainFunction"));
-	// printStack();
+	printStack();
 
 	while(L.id != (termToID("ENDOFINPUT")-44)){
 		if(top->data < 44){
@@ -399,10 +386,10 @@ void parseInputSourceCode(char *testcaseFile){
 				temp =  pop();
 				if(grammar[ParseTable[temp][L.id]-1].next->data != termToID("eps"))
 					push_rhs(ParseTable[temp][L.id]-1);
-				// printStack();
+				printStack();
 			}
 			else{
-				// printStack();
+				printStack();
 				printf("ERROR IN PARSING...No rule available\n");
 				errorInParser = 1;
 				return;
@@ -411,25 +398,25 @@ void parseInputSourceCode(char *testcaseFile){
 		else if((top->data >= 44) && (top->data != termToID("ENDOFINPUT"))){
 			if((top->data - 44) == L.id){
 				temp = pop();
-				// printStack();
+				printStack();
 				L = getNextToken(fp, b, k);
-				// printf("Token - %d, %s\n",L.id, L.value);
+				printf("Token - %d, %s\n",L.id, L.value);
 
 				//ignore Comment token
 				while(L.id == 39){
 					L = getNextToken(fp, b, k);
-					// printf("Token - %d, %s\n",L.id, L.value);
+					printf("Token - %d, %s\n",L.id, L.value);
 				}
 			}
 			else{
-				// printStack();
+				printStack();
 				printf("ERROR IN PARSING...%d not equal to %d.\n", top->data-44,L.id);
 				errorInParser = 1;
 				return;
 			}
 		}
 		else if(top->data == termToID("ENDOFINPUT")){
-			// printStack();
+			printStack();
 			printf("ERROR IN PARSING...Reached bottom of stack.\n");
 			errorInParser = 1;
 			return;
@@ -438,13 +425,13 @@ void parseInputSourceCode(char *testcaseFile){
 	}
 	if((L.id == (termToID("ENDOFINPUT")-44)) && (top->data != termToID("ENDOFINPUT"))){
 		printf("ERROR IN PARSING...Stack not empty.\n");
-		// printStack();
+		printStack();
 		errorInParser = 1;
 		return;
 	}
 	else if((L.id == (termToID("ENDOFINPUT")-44)) && (top->data == termToID("ENDOFINPUT"))){
 		printf("Successful Compilation.\n");
-		// printStack();
+		printStack();
 		return;
 	}
 	fclose(fp);

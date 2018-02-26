@@ -29,4 +29,15 @@ int pop();
 void push(int);
 void push_rhs(int);
 
+struct tree{
+	int id;
+	struct tree *firstChild;
+	struct tree *siblings;
+	char *lexeme;
+	struct tree *parent;
+	int lineNo;
+};
+
+typedef struct tree *parseTree;
+
 #endif
