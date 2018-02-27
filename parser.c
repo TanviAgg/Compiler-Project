@@ -373,7 +373,12 @@ void parseInputSourceCode(char *testcaseFile){
 	char* b = (char*) malloc(sizeof(char)*20);
 	int k = 20;
 	FILE *fp = fopen(testcaseFile, "r");
+	//char testfile[100];
+	//int inputsize = fread(testfile,1,100,fp);
+	//printf("%s\n", testfile);
+	//rewind(fp);
 	int temp;
+	memset(b,0,sizeof(b));
 	tokenInfo L = getNextToken(fp, b, k); //getNextToken returns terminals between 0-39
 	printf("Token - %d, %s\n",L.id, L.value);
 	push(termToID("ENDOFINPUT"));

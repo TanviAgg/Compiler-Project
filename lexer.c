@@ -45,7 +45,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 	token.value = (char*) malloc(sizeof(char)*k);	
 	char* lexeme = (char*) malloc(sizeof(char)*k);
 	memset(lexeme, 0, sizeof(lexeme));
-
+	//printf("%ld-%s buffer info\n", strlen(buff), buff);
 	while(1){
 		if(offset == k || buff[offset] == '\0' || strlen(buff) == 0){
 			if(feof(fp)){
@@ -57,6 +57,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 			memset(buff, 0, sizeof(buff));
 			fp = getStream(fp, buff, k);
 			offset = 0;
+			//printf("Printing buffer content: %s\n", buff);
 		}
 		switch(state){
 			case 0:
@@ -275,7 +276,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 
 					default:
 						errorInLexer = 1;
-						printf("ERROR 1: UNKNOWN SYMBOL <%c> AT LINE <%d>.\n", buff[offset], lineNo);
+						printf("LEXICAL ERROR 1: UNKNOWN SYMBOL <%c> AT LINE <%d>.\n", buff[offset], lineNo);
 						error = 1;
 						offset++;
 						break;
@@ -321,7 +322,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 				}
 				else{
 					lexeme[index++] = buff[offset++];
-					printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+					printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 					errorInLexer = 1;
 					error = 1;
 					break;
@@ -366,7 +367,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 								}
 								else{
 									lexeme[index++] = buff[offset++];
-									printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+									printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 									errorInLexer = 1;
 									error = 1;
 									break;
@@ -374,7 +375,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 							}
 							else{
 								lexeme[index++] = buff[offset++];
-								printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+								printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 								errorInLexer = 1;
 								error = 1;
 								break;
@@ -382,7 +383,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						}
 						else{
 							lexeme[index++] = buff[offset++];
-							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 							errorInLexer = 1;
 							error = 1;
 							break;
@@ -404,7 +405,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 							}
 							else{
 								lexeme[index++] = buff[offset++];
-								printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+								printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 								errorInLexer = 1;
 								error = 1;
 								break;
@@ -412,7 +413,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						}
 						else{
 							lexeme[index++] = buff[offset++];
-							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 							errorInLexer = 1;
 							error = 1;
 							break;
@@ -436,7 +437,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 								}
 								else{
 									lexeme[index++] = buff[offset++];
-									printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+									printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 									errorInLexer = 1;
 									error = 1;
 									break;
@@ -444,7 +445,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 							}
 							else{
 								lexeme[index++] = buff[offset++];
-								printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+								printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 								errorInLexer = 1;
 								error = 1;
 								break;
@@ -452,7 +453,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						}
 						else{
 							lexeme[index++] = buff[offset++];
-							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 							errorInLexer = 1;
 							error = 1;
 							break;
@@ -539,7 +540,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						break;
 					default:
 						lexeme[index++] = buff[offset++];
-						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 						errorInLexer = 1;
 						error = 1;
 						break;
@@ -600,7 +601,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 							break;
 						}
 						else{
-							printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+							printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 							errorInLexer = 1;
 							error = 1;
 							break;
@@ -656,7 +657,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						break;
 					default:
 						lexeme[index++] = buff[offset++];
-						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 						errorInLexer = 1;
 						error = 1;
 						break;
@@ -686,7 +687,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						break;
 					default:
 						lexeme[index++] = buff[offset++];
-						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 						errorInLexer = 1;
 						error = 1;
 						break;
@@ -756,7 +757,7 @@ tokenInfo getNextToken(FILE *fp, buffer buff, bufferSize k)
 						break;
 					default:
 						lexeme[index++] = buff[offset++];
-						printf("ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
+						printf("LEXICAL ERROR 2: UNKNOWN PATTERN <%s> AT LINE <%d>.\n",lexeme, lineNo);
 						errorInLexer = 1;
 						error = 1;
 						break;
